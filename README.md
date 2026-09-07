@@ -44,9 +44,8 @@ Users describe a campaign idea once; the platform generates **platform-native, s
 |---|---|
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, React Router v6, Axios, Lucide Icons, Context API |
 | **Backend** | Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic, Passlib/Bcrypt, PyJWT |
-| **Database** | PostgreSQL 16 (Production/Docker), SQLite (Zero-config local development) |
+| **Database** | PostgreSQL 16, SQLite (Zero-config local development) |
 | **AI Layer** | Abstract `AIProvider` base class → `GeminiProvider` (JSON Mode) / `OpenAIProvider` / `MockProvider` |
-| **DevOps** | Docker, Docker Compose, Multi-stage builds, Nginx SPA container |
 | **Testing** | Pytest, FastAPI TestClient, in-memory transactional SQLite fixtures |
 
 ---
@@ -80,7 +79,6 @@ Marketing_planner_genrator/
 │   │   └── utils/helpers.py
 │   ├── alembic/                     # Database migration environment and version files
 │   ├── tests/                       # Pytest test suite (16 comprehensive tests)
-│   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
@@ -93,11 +91,8 @@ Marketing_planner_genrator/
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   └── index.css
-│   ├── Dockerfile
-│   ├── nginx.conf
 │   ├── package.json
 │   └── vite.config.ts
-├── docker-compose.yml
 ├── .env.example
 ├── .gitignore
 └── README.md
@@ -163,32 +158,6 @@ npm install
 npm run dev
 ```
 Frontend Web App will be live at: `http://localhost:5173`
-
----
-
-## 🐳 Docker Deployment
-
-To launch the full stack (PostgreSQL + FastAPI + Nginx React Frontend) in isolated Docker containers:
-
-```bash
-# Build and start all services
-docker compose up --build -d
-
-# View service logs
-docker compose logs -f
-
-# Run migrations inside the backend container
-docker compose exec backend alembic upgrade head
-
-# Tear down containers and volumes
-docker compose down
-```
-
-Access:
-- **Frontend App**: `http://localhost:3000`
-- **Backend API**: `http://localhost:8000/api/v1`
-- **Swagger Docs**: `http://localhost:8000/docs`
-- **PostgreSQL**: `localhost:5432`
 
 ---
 
