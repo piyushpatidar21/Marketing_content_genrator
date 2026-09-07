@@ -1,0 +1,97 @@
+# ============================================================
+# AI Marketing Content Generator - Pre-commit Configuration
+# ============================================================
+
+minimum_pre_commit_version: "4.4.0"
+
+repos:
+
+  # ==========================================================
+  # General repository checks & Secret Prevention
+  # ==========================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+
+      # Validate YAML files
+      - id: check-yaml
+
+      # Validate JSON files (excluding tsconfig which supports comments)
+      - id: check-json
+        exclude: ^frontend/tsconfig.*\.json$
+
+      # Validate TOML files
+      - id: check-toml
+
+      # Detect unresolved Git merge conflicts
+      - id: check-merge-conflict
+
+      # Prevent accidentally committing very large files
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+      # Detect accidentally committed private keys
+      - id: detect-private-key
+
+
+  # ==========================================================
+  # Python - Ruff
+  # ==========================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.2
+    hooks:
+
+      # Python linting
+      - id: ruff-check
+        args:
+          - --fix
+
+      # Python formatting
+      - id: ruff-format
+
+
+  # ==========================================================
+  # Python - MyPy
+  # ==========================================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.3.0
+    hooks:
+
+      - id: mypy
+        files: ^backend/app/
+        exclude: ^backend/alembic/
+        args:
+          - --explicit-package-bases
+          - --ignore-missing-imports
+
+
+  # ==========================================================
+  # Frontend - Prettier
+  # ==========================================================
+  - repo: https://github.com/34j/mirrors-prettier
+    rev: v3.6.2
+    hooks:
+
+      - id: prettier
+        files: ^frontend/src/
+
+
+  # ==========================================================
+  # Frontend - TypeScript Type Checking
+  # ==========================================================
+  - repo: local
+    hooks:
+
+      - id: typescript
+        name: TypeScript type checking
+        entry: npm run type-check --prefix frontend
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+
