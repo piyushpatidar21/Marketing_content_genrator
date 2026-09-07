@@ -109,3 +109,76 @@ class DashboardStatsResponse(BaseModel):
     platform_breakdown: dict[str, int]
     recent_campaigns: list[Any]
     recent_generations: list[Any]
+
+
+# Dedicated Media-Specific Request Schemas
+
+
+class TextGenerationRequest(BaseModel):
+    campaign_id: str | None = Field(None, description="Optional campaign ID. If omitted, a default campaign is used.")
+    topic_or_idea: str | None = Field(None, description="Topic, idea, or product description if not using campaign")
+    platforms: list[str] = Field(
+        default=["instagram"],
+        min_length=1,
+        description="Target platforms (e.g. instagram, twitter, linkedin, email, blog, sms, etc.)",
+    )
+    tone: str | None = Field(None, description="Tone override (e.g. witty, professional, urgent, energetic)")
+    custom_instructions: str | None = Field(None, description="Optional extra directives for the copywriter")
+
+
+class ImageGenerationRequest(BaseModel):
+    campaign_id: str | None = Field(None, description="Optional campaign ID. If omitted, a default campaign is used.")
+    prompt_topic: str | None = Field(None, description="Description of the image subject, product, or visual concept")
+    platforms: list[str] = Field(
+        default=["instagram"],
+        min_length=1,
+        description="Target platforms (e.g. instagram, facebook, youtube, blog, linkedin)",
+    )
+    style: str | None = Field(
+        None,
+        description="Visual style (e.g. Photorealistic, 3D Render, Minimalist, Cinematic, Cyberpunk, Editorial)",
+    )
+    aspect_ratio: str | None = Field(
+        None,
+        description="Desired aspect ratio (e.g. 1:1, 16:9, 9:16, 4:5)",
+    )
+    custom_instructions: str | None = Field(None, description="Optional extra directives for image prompt generation")
+
+
+class VideoGenerationRequest(BaseModel):
+    campaign_id: str | None = Field(None, description="Optional campaign ID. If omitted, a default campaign is used.")
+    video_concept: str | None = Field(None, description="Core concept or story arc for the video")
+    platforms: list[str] = Field(
+        default=["youtube"],
+        min_length=1,
+        description="Target platforms (e.g. youtube, instagram, tiktok, linkedin, facebook)",
+    )
+    target_duration: str | None = Field(
+        None,
+        description="Target video duration (e.g. 15s, 30s, 60s, 90s)",
+    )
+    video_style: str | None = Field(
+        None,
+        description="Video production style (e.g. UGC Creator Review, Cinematic Commercial, Explainer, Teaser)",
+    )
+    custom_instructions: str | None = Field(None, description="Optional extra directives for video script generation")
+
+
+class AudioGenerationRequest(BaseModel):
+    campaign_id: str | None = Field(None, description="Optional campaign ID. If omitted, a default campaign is used.")
+    audio_concept: str | None = Field(None, description="Voiceover topic, story, or message to convey")
+    platforms: list[str] = Field(
+        default=["podcast"],
+        min_length=1,
+        description="Target platforms (e.g. podcast, youtube, radio, voiceover)",
+    )
+    voice_profile: str | None = Field(
+        None,
+        description="Voice archetype (e.g. Warm and friendly female, Authoritative deep male, Energetic youthful)",
+    )
+    pacing: str | None = Field(
+        None,
+        description="Target speech pacing (e.g. Moderate 140 WPM, Rapid 160 WPM, Calm 120 WPM)",
+    )
+    custom_instructions: str | None = Field(None, description="Optional extra directives for audio script generation")
+

@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import desc, func
 from sqlalchemy.orm import Session
 
@@ -162,6 +164,144 @@ class GenerationService:
             db.refresh(g)
 
         return saved_generations
+
+    @classmethod
+    async def generate_media(
+        cls,
+        db: Session,
+        user_id: str,
+        media_type: str,  # "text", "image", "video", "audio"
+        platforms: list[str],
+        campaign_id: str | None = None,
+        concept_or_topic: str | None = None,
+        tone: str | None = None,
+        specific_options: dict[str, Any] | None = None,
+        custom_instructions: str | None = None,
+    ) -> list[Generation]:
+        # 1. Resolve campaign (user specified or fallback default)
+        if campaign_id:
+            campaign = CampaignService.get_campaign_by_id(db, campaign_id, user_id)
+        else:
+            campaign = CampaignService.get_or_create_default_campaign(db, user_id)
+
+        # 2. Extract brand context if available
+        brand_profile_dict = BrandService.get_brand_profile_dict(db, user_id)
+
+        # 3. Campaign data dict
+        campaign_data = {
+            "name": campaign.name,
+            "idea": concept_or_topic or campaign.idea,
+            "product_service": campaign.product_service,
+            "target_audience": campaign.target_audience,
+            "age_group": campaign.age_group,
+            "location": campaign.location,
+            "interests": campaign.interests,
+            "pain_points": campaign.pain_points,
+            "goal": campaign.goal,
+            "tone": tone or campaign.tone,
+            "language": campaign.language,
+            "key_points": campaign.key_points,
+            "cta": campaign.cta,
+            "keywords": campaign.keywords,
+            "hashtag_preference": campaign.hashtag_preference,
+            "additional_instructions": campaign.additional_instructions,
+        }
+
+        # Build custom instructions incorporating specific options
+        instructions_parts = []
+        if specific_options:
+            for k, v in specific_options.items():
+                if v:
+                    label = k.replace("_", " ").title()
+                    instructions_parts.append(f"{label}: {v}")
+        if custom_instructions:
+            instructions_parts.append(custom_instructions)
+        combined_instructions = "\n".join(instructions_parts) if instructions_parts else None
+
+        ai_provider = get_ai_provider()
+        system_prompt = PromptService.get_system_prompt()
+        saved_generations: list[Generation] = []
+
+        unique_platforms = list(dict.fromkeys(platforms))
+
+        for platform in unique_platforms:
+            prompt = PromptService.create_generation_prompt(
+                campaign_data=campaign_data,
+                platform=platform,
+                media_type=media_type,
+                brand_profile=brand_profile_dict,
+                custom_instructions=combined_instructions,
+            )
+
+            input_data = {
+                "campaign_id": campaign.id,
+                "campaign_name": campaign.name,
+                "platform": platform,
+                "media_type": media_type,
+                "specific_options": specific_options or {},
+                "custom_instructions": combined_instructions,
+                "prompt_snapshot": prompt[:500] + "...",
+            }
+
+            try:
+                ai_resp = await ai_provider.generate_structured(
+                    prompt=prompt,
+                    system_prompt=system_prompt,
+                    response_schema=StructuredContentResponse,
+                )
+
+                gen_record = Generation(
+                    campaign_id=campaign.id,
+                    user_id=user_id,
+                    platform=platform,
+                    media_type=media_type,
+                    input_data=input_data,
+                    generated_content=ai_resp.content,
+                    status="completed",
+                    model=ai_resp.model,
+                    input_tokens=ai_resp.input_tokens,
+                    output_tokens=ai_resp.output_tokens,
+                    estimated_cost=ai_resp.estimated_cost,
+                    generation_time_ms=ai_resp.generation_time_ms,
+                    is_favorite=False,
+                )
+                db.add(gen_record)
+                db.flush()
+
+                variations = ai_resp.content.get("variations", [])
+                for idx, var_text in enumerate(variations):
+                    var_record = ContentVariation(
+                        generation_id=gen_record.id,
+                        title=f"Variation {idx + 1}",
+                        content={"variation_text": var_text},
+                        is_favorite=False,
+                    )
+                    db.add(var_record)
+
+                saved_generations.append(gen_record)
+
+            except Exception as e:
+                logger.exception(f"Failed {media_type} generation for {platform}: {e!s}")
+                failed_record = Generation(
+                    campaign_id=campaign.id,
+                    user_id=user_id,
+                    platform=platform,
+                    media_type=media_type,
+                    input_data=input_data,
+                    generated_content={"error": str(e)},
+                    status="failed",
+                    model=getattr(ai_provider, "model", "unknown"),
+                )
+                db.add(failed_record)
+                db.flush()
+                saved_generations.append(failed_record)
+
+        db.commit()
+        for g in saved_generations:
+            db.refresh(g)
+
+        return saved_generations
+
 
     @classmethod
     async def regenerate_content(

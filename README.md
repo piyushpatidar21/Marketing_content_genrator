@@ -190,8 +190,16 @@ npm run build
 - `PUT    /api/v1/campaigns/{id}` — Update campaign parameters
 - `DELETE /api/v1/campaigns/{id}` — Delete campaign & cascade delete generations
 
-### AI Generations
-- `POST   /api/v1/generations` — Trigger multi-platform AI generation pipeline
+### AI Generations (Dedicated & Unified)
+- `POST   /api/v1/generations/text` — **Dedicated Text Generator** (hooks, captions, threads, blogs, emails, SMS)
+- `POST   /api/v1/generations/image` — **Dedicated Image Prompt Generator** (Midjourney / DALL-E 3 / Flux prompts, styles, aspect ratios)
+- `POST   /api/v1/generations/video` — **Dedicated Video Script Generator** (scene breakdown, camera motion, dialogue, overlays)
+- `POST   /api/v1/generations/audio` — **Dedicated Audio/Voiceover Generator** (spoken script, pacing WPM, vocal archetype, BGM, SFX)
+- `GET    /api/v1/generations/text` — List text generations
+- `GET    /api/v1/generations/image` — List image generations
+- `GET    /api/v1/generations/video` — List video generations
+- `GET    /api/v1/generations/audio` — List audio generations
+- `POST   /api/v1/generations` — Unified multi-platform AI generation pipeline (all-in-one)
 - `GET    /api/v1/generations` — List generation history with platform/media filters
 - `GET    /api/v1/generations/{id}` — Get generation result with variations
 - `POST   /api/v1/generations/{id}/regenerate` — Regenerate copy with custom modification instruction

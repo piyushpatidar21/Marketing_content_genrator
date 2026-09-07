@@ -121,3 +121,30 @@ class CampaignService:
         db.delete(campaign)
         db.commit()
         return True
+
+    @staticmethod
+    def get_or_create_default_campaign(
+        db: Session,
+        user_id: str,
+        name: str = "Direct Generations",
+    ) -> Campaign:
+        campaign = (
+            db.query(Campaign)
+            .filter(Campaign.user_id == user_id, Campaign.name == name)
+            .first()
+        )
+        if not campaign:
+            campaign = Campaign(
+                user_id=user_id,
+                name=name,
+                idea="Direct media generation via dedicated API endpoints",
+                product_service="General Product / Service",
+                target_audience="Target Audience",
+                goal="brand awareness",
+                tone="persuasive and engaging",
+                language="English",
+            )
+            db.add(campaign)
+            db.flush()
+        return campaign
+

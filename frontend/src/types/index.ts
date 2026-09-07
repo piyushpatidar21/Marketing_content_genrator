@@ -223,3 +223,39 @@ export interface MediaTypeRule {
   description: string;
   fields_generated: string[];
 }
+
+export interface TextGenerationRequest {
+  campaign_id?: string;
+  topic_or_idea?: string;
+  platforms?: string[];
+  tone?: string;
+  custom_instructions?: string;
+}
+
+export interface ImageGenerationRequest {
+  campaign_id?: string;
+  prompt_topic?: string;
+  platforms?: string[];
+  style?: string;
+  aspect_ratio?: string;
+  custom_instructions?: string;
+}
+
+export interface VideoGenerationRequest {
+  campaign_id?: string;
+  video_concept?: string;
+  platforms?: string[];
+  target_duration?: string;
+  video_style?: string;
+  custom_instructions?: string;
+}
+
+export interface AudioGenerationRequest {
+  campaign_id?: string;
+  audio_concept?: string;
+  platforms?: string[];
+  voice_profile?: string;
+  pacing?: string;
+  custom_instructions?: string;
+}
+

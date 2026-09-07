@@ -6,6 +6,10 @@ import {
   DashboardStats,
   PlatformRule,
   MediaTypeRule,
+  TextGenerationRequest,
+  ImageGenerationRequest,
+  VideoGenerationRequest,
+  AudioGenerationRequest,
 } from "../types";
 
 export const generationService = {
@@ -21,6 +25,47 @@ export const generationService = {
     );
     return res.data;
   },
+
+  async generateText(
+    data: TextGenerationRequest,
+  ): Promise<ApiResponse<MultiGenerationResponse>> {
+    const res = await api.post<ApiResponse<MultiGenerationResponse>>(
+      "/generations/text",
+      data,
+    );
+    return res.data;
+  },
+
+  async generateImage(
+    data: ImageGenerationRequest,
+  ): Promise<ApiResponse<MultiGenerationResponse>> {
+    const res = await api.post<ApiResponse<MultiGenerationResponse>>(
+      "/generations/image",
+      data,
+    );
+    return res.data;
+  },
+
+  async generateVideo(
+    data: VideoGenerationRequest,
+  ): Promise<ApiResponse<MultiGenerationResponse>> {
+    const res = await api.post<ApiResponse<MultiGenerationResponse>>(
+      "/generations/video",
+      data,
+    );
+    return res.data;
+  },
+
+  async generateAudio(
+    data: AudioGenerationRequest,
+  ): Promise<ApiResponse<MultiGenerationResponse>> {
+    const res = await api.post<ApiResponse<MultiGenerationResponse>>(
+      "/generations/audio",
+      data,
+    );
+    return res.data;
+  },
+
 
   async list(params?: {
     skip?: number;
