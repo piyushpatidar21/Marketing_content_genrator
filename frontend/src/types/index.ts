@@ -121,8 +121,15 @@ export interface GeneratedContent {
   image_prompt_details?: ImagePromptDetails;
   video_script?: VideoScriptDetails;
   audio_script?: AudioScriptDetails;
+  image_url?: string;
+  audio_url?: string;
+  audio_base64?: string;
+  video_url?: string;
+  video_task_id?: string;
+  ai_provider_used?: string;
   variations?: string[];
 }
+
 
 export interface ContentVariation {
   id: string;
