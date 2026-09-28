@@ -218,7 +218,7 @@ class GenerationService:
             instructions_parts.append(custom_instructions)
         combined_instructions = "\n".join(instructions_parts) if instructions_parts else None
 
-        ai_provider = get_ai_provider()
+        ai_provider = get_ai_provider(media_type=media_type)
         system_prompt = PromptService.get_system_prompt()
         saved_generations: list[Generation] = []
 

@@ -30,8 +30,17 @@ class StructuredContentResponse(BaseModel):
     video_script: dict[str, Any] | None = Field(None, description="Scene-by-scene video script breakdown")
     audio_script: dict[str, Any] | None = Field(None, description="Voiceover script, tone, speed, BGM suggestions")
 
+    # Generated Asset Artifacts (from OpenAI Image, ElevenLabs, Runway/Veo)
+    image_url: str | None = Field(None, description="Direct URL of the generated image (OpenAI / DALL-E)")
+    audio_url: str | None = Field(None, description="Direct URL or audio data URI for generated ElevenLabs speech")
+    audio_base64: str | None = Field(None, description="Base64 encoded MP3 audio data")
+    video_url: str | None = Field(None, description="Direct URL of the generated video (Runway / Veo)")
+    video_task_id: str | None = Field(None, description="Asynchronous video generation task ID")
+    ai_provider_used: str | None = Field(None, description="Identifier of the specific AI provider that generated this asset")
+
     # Alternative variations
     variations: list[str] = Field(default_factory=list, description="Alternative hooks, angles, or phrasing")
+
 
 
 class GenerationCreateRequest(BaseModel):
